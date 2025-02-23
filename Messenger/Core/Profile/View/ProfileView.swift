@@ -55,7 +55,9 @@ struct ProfileView: View {
                     }
                     
                     Button("Delete Account") {
-                        
+                        Task {
+                            try await AuthService.shared.deleteAccount()
+                        }
                     }
                 }
                 .foregroundColor(.red)

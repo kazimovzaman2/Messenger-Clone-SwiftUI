@@ -53,6 +53,26 @@ class AuthService {
         }
     }
     
+    func deleteAccount() async throws {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        do {
+            // Delete user collection with user id
+            try await FirestoreConstants.UserCollection.document(user.uid).delete()
+            
+            // Delete message collection with user id
+            try await FirestoreConstants.MessagesCollection.document(user.uid).delete()
+            
+            // Delete user from Authentication
+            try await user.delete()
+            
+            self.userSession = nil
+            UserService.shared.currentUser = nil
+        } catch {
+            print("DEBUG: \(error.localizedDescription)")
+        }
+    }
+    
     private func uploadUserData(email: String, fullname: String, id: String) async throws {
         let user = User(fullname: fullname, email: email, profileImageUrl: nil)
         guard let encodedUser = try? Firestore.Encoder().encode(user) else { return }
